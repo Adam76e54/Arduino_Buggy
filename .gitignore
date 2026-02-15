@@ -1,0 +1,18 @@
+# External libraries not in repo
+Adafruit_BusIO/
+Adafruit_GFX_Library/
+Adafruit_GPS_Library/
+Adafruit_ILI9341/
+Adafruit_LED_Backpack_Library/
+Adafruit_SH110X/
+Adafruit_STMPE610/
+Adafruit_TSC2007/
+Adafruit_TouchScreen/
+Adafruit_Unified_Sensor/
+ArduinoOTA/
+DHT_sensor_library/
+Joystick/
+MFRC522/
+RTClib/
+SD/
+WaveHC/
