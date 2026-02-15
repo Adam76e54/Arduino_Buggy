@@ -16,3 +16,4 @@ MFRC522/
 RTClib/
 SD/
 WaveHC/
+.vscode/
