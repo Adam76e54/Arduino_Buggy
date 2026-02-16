@@ -100,7 +100,7 @@ void handleSpeed(char command[], const uint8_t n){
       state::leftSpeedPercentage = state::rightSpeedPercentage = percentage;
       state::targetLeftRPM = state::targetRightRPM = state::MAX_RPM * percentage;
 
-      sendEvent(GUI, "Speed changed to ", percentage);
+      // sendEvent(GUI, "Speed changed to ", percentage);
       // if(Serial) Serial.println("Changed speed");
     }
 
@@ -145,9 +145,12 @@ void handleModes(char command[], L293D& driver){
   }  
   if(strncmp(command, comm::TRACK, strlen(comm::TRACK)) == 0){  
     state::mode = TRACK;
+    state::stopped = true;
+    driver.coast();
   }  
   if(strncmp(command, comm::FOLLOW, strlen(comm::FOLLOW)) == 0){  
     state::mode = FOLLOW;
+    driver.coast();
   }  
 }
 
