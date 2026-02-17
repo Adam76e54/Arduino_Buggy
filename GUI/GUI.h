@@ -142,13 +142,11 @@ void handleModes(char command[], L293D& driver){
   if(strncmp(command, comm::MANUAL, strlen(comm::MANUAL)) == 0){  
     state::mode = MANUAL;
     driver.coast();//immediately stop
-  }  
-  if(strncmp(command, comm::TRACK, strlen(comm::TRACK)) == 0){  
+  } else if(strncmp(command, comm::TRACK, strlen(comm::TRACK)) == 0){  
     state::mode = TRACK;
     state::stopped = true;
     driver.coast();
-  }  
-  if(strncmp(command, comm::FOLLOW, strlen(comm::FOLLOW)) == 0){  
+  } else if(strncmp(command, comm::FOLLOW, strlen(comm::FOLLOW)) == 0){  
     state::mode = FOLLOW;
     driver.coast();
   }  
@@ -190,10 +188,14 @@ void handleDistance(char command[]){
 }
 
 void handleStopStart(char command[]){
+  Serial.println("Inside handlStopStart()");
+  Serial.println(command);
   if(strncmp(command, comm::STOP, strlen(comm::STOP)) == 0){
+    Serial.println("Stopped = true");
     state::stopped = true;
   }
   if(strncmp(command, comm::START, strlen(comm::START)) == 0){
+    Serial.println("Stopped = false");
     state::stopped = false;
   }
 }
@@ -246,6 +248,6 @@ void sendEvent(WiFiClient& GUI, const char* message, float num){
     GUI.print(comm::EVENT);
     GUI.print(comm::DELIMITER);
     GUI.print(message);
-    GUI.println(message);
+    GUI.println(num);
   }
 }

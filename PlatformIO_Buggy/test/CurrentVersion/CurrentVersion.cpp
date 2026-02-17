@@ -10,10 +10,11 @@ WiFiClient GUI;
 L293D driver(6,7,11,12,9,10);//new setup
 
 HCSR04 ears(5, 4);
-
+int left = analogRead(1);
 TCRT5000 leftEye(1, 8, 1), rightEye(0, 13, 1);
 
 void setup(){
+
   Serial.begin(115200);
 
   wifi::initialiseAccessPoint();
@@ -27,6 +28,7 @@ void setup(){
 void loop(){
   keep(GUI, server);
 
+  analogWrite()
   //read commands from the GUI, could be multiple commands
   read(GUI, inBuffer);
 
@@ -40,9 +42,11 @@ void loop(){
 
   //act on sensor data (drive)
   if(state::mode == MANUAL){
+    // Serial.println("Mode = Manual");
     manualLoop();//this currently does nothing
   }
   if(state::mode == TRACK){
+    // Serial.println("Mode = Track");
     bool left = leftEyeValue > state::leftThreshold;
     bool right = rightEyeValue > state::rightThreshold;
     trackLoop(left, right, distance, GUI);
@@ -55,7 +59,7 @@ void loop(){
   static uint8_t clock = 0, numberOfSends = 3;
   auto now = millis();
   if(now - lastTime > SEND_RATE){
-
+    // if(state::stopped) sendEvent(GUI, "Stopped state = ", state::stopped);
     lastTime = now;
     clock = (clock + 1)% numberOfSends;
     if(clock % numberOfSends == 0) sendIRright(GUI, rightEyeValue);
@@ -73,17 +77,16 @@ void manualLoop(){
 
 void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   constexpr float offset = 0.21;
-  constexpr float scaleDown = 16;
-  constexpr float minTurnSpeed = 0.4;//may need to set this to 0 but we'll tune it to get nicer movement if we can
+  // constexpr float minTurnSpeed = 0.4;//may need to set this to 0 but we'll tune it to get nicer movement if we can
   static bool obstacle = false;
-  if(distance > state::maxDistance && !stopped){//if the distance is safe and we're not stop-commanded, go ahead
+  if(distance > state::maxDistance && !state::stopped){//if the distance is safe and we're not stop-commanded, go ahead
     obstacle = false;
     if(left && right){
       driver.forward(state::leftSpeedPercentage - offset, state::rightSpeedPercentage);
     } else if(left && !right){
-      driver.forward((state::leftSpeedPercentage - offset), minTurnSpeed);
+      driver.forward((state::leftSpeedPercentage - offset), 0);
     } else if(!left && right){
-      driver.forward(minTurnSpeed - offset, (state::rightSpeedPercentage));
+      driver.forward(0, state::rightSpeedPercentage);
     } else{
       driver.coast();
     }
