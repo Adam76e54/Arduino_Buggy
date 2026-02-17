@@ -99,7 +99,7 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   static uint8_t closeCount = 0;
   constexpr uint8_t MAX_CLOSE_COUNT = 100;
 
-  //sanity check to fliter dodgy sensor readings
+  //sanity check to filter dodgy sensor readings
   if(distance <= state::maxDistance){
     if(closeCount < MAX_CLOSE_COUNT){
       closeCount++;
@@ -109,6 +109,7 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   }
 
   bool safe = (distance > state::maxDistance) || (closeCount < MAX_CLOSE_COUNT);
+  
   if(!state::stopped && safe){//if the distance is safe and we're not stop-commanded, go ahead
     obstacle = false;
 
