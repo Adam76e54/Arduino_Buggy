@@ -35,7 +35,8 @@ void loop(){
   handle(inBuffer, driver);
 
   //poll sensors
-  float distance = ears.poll(200); 
+  constexpr uint8_t US_POLLING_RATE = 150;
+  float distance = ears.poll(US_POLLING_RATE); 
   unsigned int leftEyeValue = leftEye.band();
   unsigned int rightEyeValue = rightEye.band();
 
@@ -67,6 +68,23 @@ void loop(){
 
     if(clock % numberOfSends == 2) sendDistance(GUI, distance);
 
+  }
+
+  //poll sensors again 
+  distance = ears.poll(US_POLLING_RATE); 
+  leftEyeValue = leftEye.band();
+  rightEyeValue = rightEye.band();
+
+  //act on sensor data (drive)
+  if(state::mode == MANUAL){
+    // Serial.println("Mode = Manual");
+    manualLoop();//this currently does nothing
+  }
+  if(state::mode == TRACK){
+    // Serial.println("Mode = Track");
+    bool left = leftEyeValue > state::leftThreshold;
+    bool right = rightEyeValue > state::rightThreshold;
+    trackLoop(left, right, distance, GUI);
   }
 }
 
