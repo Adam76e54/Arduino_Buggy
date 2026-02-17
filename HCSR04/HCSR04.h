@@ -28,10 +28,7 @@ public:
 
     unsigned long duration = pulseIn(echo_, HIGH, 3000);
     
-    // Serial.print("Duration:");
-    // Serial.println(duration);
-    // Serial.print("Distance: ");
-    // Serial.println((duration*0.0343)/2);
+    if(distance == 0) return 999.0;//zero shouldn't happen so assume it's far away
     return (duration*0.0343)/2;
   }
 
