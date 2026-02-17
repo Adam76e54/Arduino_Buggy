@@ -26,7 +26,7 @@ public:
     delayMicroseconds(10);
     digitalWrite(trig_, LOW);
 
-    unsigned long duration = pulseIn(echo_, HIGH);
+    unsigned long duration = pulseIn(echo_, HIGH, 3000);
     
     // Serial.print("Duration:");
     // Serial.println(duration);
