@@ -28,7 +28,7 @@ public:
 
     unsigned long duration = pulseIn(echo_, HIGH, 3000);
     
-    if(distance == 0) return 999.0;//zero shouldn't happen so assume it's far away
+    if(duration == 0) return 999.0;//zero shouldn't happen so assume it's far away
     return (duration*0.0343)/2;
   }
 
