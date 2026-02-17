@@ -28,7 +28,6 @@ void setup(){
 void loop(){
   keep(GUI, server);
 
-  analogWrite()
   //read commands from the GUI, could be multiple commands
   read(GUI, inBuffer);
 
@@ -76,11 +75,25 @@ void manualLoop(){
 }
 
 void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
-  constexpr float offset = 0.21;
+  constexpr float offset = 0.18;
   // constexpr float minTurnSpeed = 0.4;//may need to set this to 0 but we'll tune it to get nicer movement if we can
   static bool obstacle = false;
-  if(distance > state::maxDistance && !state::stopped){//if the distance is safe and we're not stop-commanded, go ahead
+  static uint8_t closeCount = 0;
+  constexpr uint8_t MAX_CLOSE_COUNT = 100;
+
+  //sanity check to fliter dodgy sensor readings
+  if(distance <= state::maxDistance){
+    if(closeCount < MAX_CLOSE_COUNT){
+      closeCount++;
+    } 
+  } else {
+    closeCount = 0;
+  }
+
+  bool safe = (distance > state::maxDistance) || (closeCount < MAX_CLOSE_COUNT);
+  if(!state::stopped && safe){//if the distance is safe and we're not stop-commanded, go ahead
     obstacle = false;
+
     if(left && right){
       driver.forward(state::leftSpeedPercentage - offset, state::rightSpeedPercentage);
     } else if(left && !right){
