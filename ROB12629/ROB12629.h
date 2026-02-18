@@ -32,10 +32,14 @@ class ROB12629{
       return counter_;
     }
 
-    void poll(){
-      auto now = micros();
+    unsigned long lastCount() const{
+      return lastCounter_
+    }
+
+    void update(unsigned long interval){
+      auto now = millis();
       unsigned long dt = now - lastTime_;
-      if(dt < 100000) return;//only update every 100 ms
+      if(dt < interval) return;//only update every 100 ms
       lastTime_ = now;
 
       unsigned int dc = counter_ - lastCounter_;
