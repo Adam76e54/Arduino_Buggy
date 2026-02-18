@@ -129,13 +129,13 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
     if(distance <= state::maxDistance && !obstacle){//if there previously wasn't an obstacle but now there is, send event
       obstacle = true;
       state::stopped = true;
-      sendEvent(GUI, "Stopped for obstacle");
+      sendEvent(GUI, comm::OBSTACLE_MESSAGE);
     }
 
     if(obstacle && distance >= state::maxDistance){
       obstacle = false;
       state::stopped = false;
-      sendEvent(GUI, "Obstacle removed");
+      sendEvent(GUI, state::REMOVED_MESSAGE);
     }
   }
 }

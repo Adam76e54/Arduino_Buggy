@@ -9,8 +9,8 @@ namespace state{
   float targetLeftRPM = 0;
   float targetRightRPM = 0;
 
-  unsigned int leftThreshold = 74;
-  unsigned int rightThreshold = 140;
+  unsigned int leftThreshold = 150;
+  unsigned int rightThreshold = 150;
   float maxDistance = 15.0;
 
   bool stopped = true;
