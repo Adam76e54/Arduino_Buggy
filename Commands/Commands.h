@@ -26,4 +26,7 @@ namespace comm
   constexpr const char* FOLLOW = "FLLW";
 
   constexpr const char* EVENT = "EVNT";
+
+  constexpr const char* REMOVED_MESSAGE = "Obstacle removed";
+  constexpr const char* OBSTACLE_MESSAGE = "Stopped for obstacle";
 }
