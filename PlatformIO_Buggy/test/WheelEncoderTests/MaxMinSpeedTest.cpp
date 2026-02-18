@@ -58,6 +58,6 @@ void loop(){
     sendEvent(GUI, "Right rpm = ", rightEncoder.rpm());
   }
 
-  driver.forward(1 - 0.18, 1);
+  driver.forward(0.81, 1);
 }
 
