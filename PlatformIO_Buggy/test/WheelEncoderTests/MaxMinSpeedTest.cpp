@@ -14,10 +14,10 @@ ROB12629 leftEncoder(2), rightEncoder(3);
 
 //Interrupt Service Routines for the encoders
 void ISRL(){
-  leftEncoder.poll();
+  leftEncoder.increment();
 }
 void ISRR(){
-  rightEncoder.poll();
+  rightEncoder.increment();
 }
 
 void setup(){
@@ -34,39 +34,30 @@ void setup(){
 
 unsigned long lastTime = 0;
 void loop(){
-  WiFiClient newClient = server.available();
-  if(newClient){
-    GUI = newClient;
-  }
+  keep(GUI, server);
 
   //read commands from the GUI, could be multiple commands
   read(GUI, inBuffer);
 
   //handle commands in Buffer
-  handle(inBuffer);
-  float distance = ears.poll(200); 
+  handle(inBuffer, driver);
+
+  //update rpm
+  leftEncoder.update(100);
+  rightEncoder.update(100);
 
   //print the current rpm on the left side
-  auto leftRPM = leftEncoder.rpm();
-  Serial.println(leftEncoder.rpm());
-
   auto now = millis();
-  if(now - lastTime > 100){
+  if(now - lastTime > 500){
     lastTime = now;
 
-    GUI.print(comm::EVENT);
-    GUI.print(comm::DELIMITER);
-    GUI.print("Distance from ears: ");
-    GUI.print(distance);
-    GUI.print(" Left RPM: ");
-    GUI.println(leftRPM);
+    //sendEvent(GUI, "Left dc = ", leftEncoder.count() - leftEncoder.lastCount());
+    //sendEvent(GUI, "Right dc = ", rightEncoder.count() - rightEncoder.lastCount());
+
+    sendEvent(GUI, "Left rpm = ", leftEncoder.rpm());
+    sendEvent(GUI, "Right rpm = ", rightEncoder.rpm());
   }
 
-  if(distance > 20){
-    driver.forward(state::leftSpeedPercentage, state::rightSpeedPercentage);
-  } else{
-    driver.coast();
-    delay(10);
-  }  
+  driver.forward(1 - 0.18, 1);
 }
 
