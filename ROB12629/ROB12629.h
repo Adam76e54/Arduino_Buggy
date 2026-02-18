@@ -8,7 +8,7 @@ class ROB12629{
     volatile unsigned long counter_;
     volatile unsigned long lastCounter_;
     volatile unsigned long lastTime_;
-    volatile double double rpm_;
+    volatile double rpm_;
     static constexpr float COUNTS_PER_REV_ = 4.0f;
   public:
     ROB12629(uint8_t pin) : pin_(pin), counter_(0), lastCounter_(0), lastTime_(0), rpm_(0){
@@ -42,7 +42,10 @@ class ROB12629{
       if(dt_m < interval) return;//only update if over the interval
       lastTime_ = now;
 
+      noInterrupts();
       unsigned int dc = counter_ - lastCounter_;
+      interrupts();
+
       lastCounter_ = counter_;
 
       if(dc == 0){
@@ -55,7 +58,7 @@ class ROB12629{
       rpm_ = (revs/dt) * 60.0f;
     }
 
-    float rpm() const{
+    double rpm() const{
       return rpm_;
     }
 };
