@@ -8,7 +8,7 @@ class ROB12629{
     volatile unsigned long counter_;
     volatile unsigned long lastCounter_;
     volatile unsigned long lastTime_;
-    volatile float rpm_;
+    volatile double double rpm_;
     static constexpr float COUNTS_PER_REV_ = 4.0f;
   public:
     ROB12629(uint8_t pin) : pin_(pin), counter_(0), lastCounter_(0), lastTime_(0), rpm_(0){
@@ -33,12 +33,12 @@ class ROB12629{
     }
 
     unsigned long lastCount() const{
-      return lastCounter_
+      return lastCounter_;
     }
 
     void update(unsigned long interval){
-      auto now = millis();
-      unsigned long dt = now - lastTime_;
+      auto now = micros();
+      unsigned long dt_m = now - lastTime_;
       if(dt < interval) return;//only update every 100 ms
       lastTime_ = now;
 
@@ -50,8 +50,8 @@ class ROB12629{
         return;
       }
 
-      float revs = static_cast<float>(dc) / COUNTS_PER_REV_;
-      dt = dt * 1e-6;//convert mircos to seconds;
+      float revs = (float)dc / COUNTS_PER_REV_;
+      double dt_s = dt_m * 1e-6f;//convert mircos to seconds;
       rpm_ = (revs/dt) * 60.0f;
     }
 
