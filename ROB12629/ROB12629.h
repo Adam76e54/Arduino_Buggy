@@ -55,7 +55,7 @@ class ROB12629{
 
       float revs = (float)dc / COUNTS_PER_REV_;
       double dt_s = dt_m * 1e-6f;//convert mircos to seconds;
-      rpm_ = (revs/dt) * 60.0f;
+      rpm_ = (revs/dt_s) * 60.0f;
     }
 
     double rpm() const{
