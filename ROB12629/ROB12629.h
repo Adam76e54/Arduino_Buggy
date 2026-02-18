@@ -39,7 +39,7 @@ class ROB12629{
     void update(unsigned long interval){
       auto now = micros();
       unsigned long dt_m = now - lastTime_;
-      if(dt < interval) return;//only update every 100 ms
+      if(dt_m < interval) return;//only update if over the interval
       lastTime_ = now;
 
       unsigned int dc = counter_ - lastCounter_;
