@@ -19,10 +19,11 @@ void handleStopStart(char command[]);
 
 
 //read command into buffer
+constexpr uint8_t MAX_HANDLE_AND_READ_ITERATIONS = 3;
 template <uint8_t N> 
 bool read(WiFiClient& GUI, Buffer<N>& buffer){
   if(GUI && GUI.connected()){
-    for(uint8_t i = 0; i < 5; ++i){//we can tune this
+    for(uint8_t i = 0; i < MAX_HANDLE_AND_READ_ITERATIONS; ++i){//we can tune this
       while(GUI.available() > 0){
         byte commandByte = GUI.read();
         buffer.write(commandByte);
@@ -36,12 +37,18 @@ bool read(WiFiClient& GUI, Buffer<N>& buffer){
 //handle current buffer of commands
 template <uint8_t N> 
 void handle(Buffer<N>& buffer, L293D& driver){
-  for(uint8_t i = 0; i < 5; ++i){//we can tune this
+  static constexpr HANDLE_INTERVAL = 50;
+  static unsigned long lastTime = 0;
+  auto now = millis();
+  for(uint8_t i = 0; i < MAX_HANDLE_AND_READ_ITERATIONS; ++i){//we can tune this
     if(state::mode == MANUAL){
       manualHandle(buffer, driver);
     }
     if(state::mode == TRACK){
-      trackHandle(buffer, driver);
+      if(now - lastTime > HANDLE_INTERVAL){
+        lastTime = now;
+        trackHandle(buffer, driver);
+      }
     }
     if(state::mode == FOLLOW){
       followHandle(buffer, driver);
