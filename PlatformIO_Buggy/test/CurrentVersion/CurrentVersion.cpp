@@ -62,7 +62,7 @@ void loop(){
   //tick through the sending commands every 500 ms (may be able to tweek it to be lower)
   //NOTE: we tick through rather than send everything at once to avoid slowing the IR sensing
   constexpr unsigned int SEND_RATE = 500;
-  static unsigned long lastTime = 0; 
+  static unsigned long lastTime = 0,  lastDebug = 0;; 
   static uint8_t clock = 0, numberOfSends = 3;
   auto now = millis();
   if(now - lastTime > SEND_RATE){
@@ -99,15 +99,18 @@ void loop(){
   auto d2 = micros();
   auto pollMoveTime_2 = d2 - d1;
 
-  auto loopTime = a1 - d2;
+  auto loopTime = d2 - a1;
 
-  if(now - lastTime > SEND_RATE){
+ 
+  if(now - lastDebug > SEND_RATE){
+    lastDebug = now;
     sendEvent(GUI, "Time to handle = ", keepReadHandleTime);
     sendEvent(GUI, "Time for first poll and move = ", pollMoveTime_1);
     sendEvent(GUI, "Time to send = ", sendTime);
     sendEvent(GUI, "Time for second poll and move = ", pollMoveTime_2);
     sendEvent(GUI, "Loop time = ", loopTime);
   }
+
 }
 
 void manualLoop(){
