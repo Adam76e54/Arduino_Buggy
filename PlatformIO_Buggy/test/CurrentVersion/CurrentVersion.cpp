@@ -158,7 +158,7 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
     if(obstacle && distance >= state::maxDistance){
       obstacle = false;
       state::stopped = false;
-      sendEvent(GUI, state::REMOVED_MESSAGE);
+      sendEvent(GUI, comm::REMOVED_MESSAGE);
     }
   }
 }
