@@ -112,13 +112,14 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   
   if(!state::stopped && safe){//if the distance is safe and we're not stop-commanded, go ahead
     obstacle = false;
+    constexpr float turnFactor = 0.3;
 
     if(left && right){
       driver.forward(state::leftSpeedPercentage - offset, state::rightSpeedPercentage);
     } else if(left && !right){
-      driver.forward((state::leftSpeedPercentage - offset), 0);
+      driver.forward((state::leftSpeedPercentage - offset), state::rightSpeedPercentage * turnFactor);
     } else if(!left && right){
-      driver.forward(0, state::rightSpeedPercentage);
+      driver.forward((state::leftSpeedPercentage - offset) * turnFactor, state::rightSpeedPercentage);
     } else{
       driver.coast();
     }
