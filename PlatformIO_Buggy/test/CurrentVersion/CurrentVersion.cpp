@@ -54,7 +54,7 @@ void loop(){
 
   //tick through the sending commands every 500 ms (may be able to tweek it to be lower)
   //NOTE: we tick through rather than send everything at once to avoid slowing the IR sensing
-  constexpr unsigned int SEND_RATE = 500;
+  constexpr unsigned int SEND_RATE = 400;
   static unsigned long lastTime = 0; 
   static uint8_t clock = 0, numberOfSends = 3;
   auto now = millis();
