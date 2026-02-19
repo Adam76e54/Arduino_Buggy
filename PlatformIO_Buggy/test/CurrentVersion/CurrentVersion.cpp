@@ -26,6 +26,7 @@ void setup(){
 }
 
 void loop(){
+  auto a1 = micros();
   keep(GUI, server);
 
   //read commands from the GUI, could be multiple commands
@@ -33,8 +34,11 @@ void loop(){
 
   //handle commands in Buffer
   handle(inBuffer, driver);
+  auto a2 = micros();
+  auto keepReadHandleTime = a2 - a1;
 
   //poll sensors
+  auto b1 = micros();
   constexpr uint8_t US_POLLING_RATE = 150;
   float distance = ears.poll(US_POLLING_RATE); 
   unsigned int leftEyeValue = leftEye.band();
@@ -51,7 +55,10 @@ void loop(){
     bool right = rightEyeValue > state::rightThreshold;
     trackLoop(left, right, distance, GUI);
   }
+  auto b2 = micros();
+  auto pollMoveTime_1 = b2 - b1;
 
+  auto c1 = micros();
   //tick through the sending commands every 500 ms (may be able to tweek it to be lower)
   //NOTE: we tick through rather than send everything at once to avoid slowing the IR sensing
   constexpr unsigned int SEND_RATE = 500;
@@ -69,7 +76,10 @@ void loop(){
     if(clock % numberOfSends == 2) sendDistance(GUI, distance);
 
   }
+  auto c2 = micros();
+  auto sendTime = c2 - c1;
 
+  auto d1 = micros();
   //poll sensors again 
   distance = ears.poll(US_POLLING_RATE); 
   leftEyeValue = leftEye.band();
@@ -86,6 +96,12 @@ void loop(){
     bool right = rightEyeValue > state::rightThreshold;
     trackLoop(left, right, distance, GUI);
   }
+  auto d2 = micros();
+  auto pollMoveTime_2 = d2 - d1;
+
+  auto loopTime = a1 - d2;
+
+  
 }
 
 void manualLoop(){
