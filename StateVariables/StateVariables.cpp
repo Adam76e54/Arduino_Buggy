@@ -13,5 +13,6 @@ namespace state{
   unsigned int rightThreshold = 150;
   float maxDistance = 15.0;
 
+  uint8_t ultrasonicSensitivity = 15;
   bool stopped = true;
 };

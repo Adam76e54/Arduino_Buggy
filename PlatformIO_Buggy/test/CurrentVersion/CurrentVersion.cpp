@@ -103,7 +103,7 @@ void loop(){
 
   if(now - lastTime > SEND_RATE){
     sendEvent(GUI, "Time to handle = ", keepReadHandleTime);
-    sendEvent(GUI, "Time for first poll and move = ", pollMoveTime_ 1);
+    sendEvent(GUI, "Time for first poll and move = ", pollMoveTime_1);
     sendEvent(GUI, "Time to send = ", sendTime);
     sendEvent(GUI, "Time for second poll and move = ", pollMoveTime_2);
     sendEvent(GUI, "Loop time = ", loopTime);

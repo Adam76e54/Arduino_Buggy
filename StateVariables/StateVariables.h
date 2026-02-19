@@ -23,6 +23,7 @@ namespace state{
   extern unsigned int rightThreshold;
   extern float maxDistance;
 
+  extern uint8_t ultrasonicSensitivity;
   extern bool stopped;
 };
 
