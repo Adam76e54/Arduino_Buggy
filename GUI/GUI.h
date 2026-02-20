@@ -37,7 +37,7 @@ bool read(WiFiClient& GUI, Buffer<N>& buffer){
 //handle current buffer of commands
 template <uint8_t N> 
 void handle(Buffer<N>& buffer, L293D& driver){
-  static constexpr HANDLE_INTERVAL = 50;
+  static constexpr uint8_t HANDLE_INTERVAL = 50;
   static unsigned long lastTime = 0;
   auto now = millis();
   for(uint8_t i = 0; i < MAX_HANDLE_AND_READ_ITERATIONS; ++i){//we can tune this
