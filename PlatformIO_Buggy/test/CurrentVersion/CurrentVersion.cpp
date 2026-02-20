@@ -97,7 +97,7 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   // constexpr float minTurnSpeed = 0.4;//may need to set this to 0 but we'll tune it to get nicer movement if we can
   static bool obstacle = false;
   static uint8_t closeCount = 0;
-  constexpr uint8_t MAX_CLOSE_COUNT = 15;
+  constexpr uint8_t MAX_CLOSE_COUNT = 10;
 
   //sanity check to filter dodgy sensor readings
   if(distance <= state::maxDistance){
@@ -136,7 +136,7 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
     if(obstacle && distance >= state::maxDistance){
       obstacle = false;
       state::stopped = false;
-      sendEvent(GUI, state::REMOVED_MESSAGE);
+      sendEvent(GUI, comm::REMOVED_MESSAGE);
     }
   }
 }
