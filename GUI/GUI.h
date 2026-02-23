@@ -212,11 +212,18 @@ void sendIRleft(WiFiClient& GUI, unsigned int left){
   if(GUI && GUI.connected()){
     // GUI.print(comm::EVENT);
     // GUI.print(comm::DELIMITER);
-    GUI.print(comm::LEFT);
-    GUI.print(comm::DELIMITER);
-    GUI.print(comm::IR);
-    GUI.print(comm::DELIMITER);
-    GUI.println(left);
+    char message[64];
+
+    int n = snprintf(message, sizeof(message), "%s%c%s%c%d", comm::LEFT, comm::DELIMITER, comm::IR, comm::DELIMITER, left);
+
+    if(n > 0 && n < (int)sizeof(message)){
+      GUI.println(message);
+    }
+    // GUI.print(comm::LEFT);
+    // GUI.print(comm::DELIMITER);
+    // GUI.print(comm::IR);
+    // GUI.print(comm::DELIMITER);
+    // GUI.println(left);
   }
 }
 
@@ -224,11 +231,19 @@ void sendIRright(WiFiClient& GUI, unsigned int right){
   if(GUI && GUI.connected()){
     // GUI.print(comm::EVENT);
     // GUI.print(comm::DELIMITER);
-    GUI.print(comm::RIGHT);
-    GUI.print(comm::DELIMITER);
-    GUI.print(comm::IR);
-    GUI.print(comm::DELIMITER);
-    GUI.println(right);
+
+    char message[64]; // leaving room for the size of the numbers
+
+    int n = snprintf(message, sizeof(message), "%s%c%s%c%d", comm::RIGHT, comm::DELIMITER, comm::IR, comm::DELIMITER, right);
+
+    if(n > 0 && n < (int)sizeof(message)){
+      GUI.println(message);
+    }
+    // GUI.print(comm::RIGHT);
+    // GUI.print(comm::DELIMITER);
+    // GUI.print(comm::IR);
+    // GUI.print(comm::DELIMITER);
+    // GUI.println(right);
   }
 }
 
@@ -236,25 +251,56 @@ void sendDistance(WiFiClient& GUI, float distance){
   if(GUI && GUI.connected()){
     // GUI.print(comm::EVENT);
     // GUI.print(comm::DELIMITER);
-    GUI.print(comm::ULTRA_SONIC);
-    GUI.print(comm::DELIMITER);
-    GUI.println(distance);
+    char message[64];
+    char distanceAsString[16];
+
+    dtostrf(distance, 0, 2, distanceAsString); // apparently %f printf() is disabled by default and this is preferred, no idea why
+
+    int n = snprintf(message, sizeof(message), "%s%c%s", comm::ULTRA_SONIC, comm::DELIMITER, distanceAsString);
+
+    if(n > 0 && n < (int)sizeof(message)){
+      GUI.println(message);
+    }
+
+    // GUI.print(comm::ULTRA_SONIC);
+    // GUI.print(comm::DELIMITER);
+    // GUI.println(distance);
   }
 }
 
-void sendEvent(WiFiClient& GUI, const char* message){
+void sendEvent(WiFiClient& GUI, const char* event){
   if(GUI && GUI.connected()){
-    GUI.print(comm::EVENT);
-    GUI.print(comm::DELIMITER);
-    GUI.println(message);
+    char message[128];
+
+    int n = snprintf(message, sizeof(message), "%s%c%s", comm::EVENT, comm::DELIMITER, event);
+
+    if(n > 0 && n < (int)sizeof(message)){
+      GUI.println(message);
+    }
+
+    // GUI.print(comm::EVENT);
+    // GUI.print(comm::DELIMITER);
+    // GUI.println(message);
   }
 }
 
-void sendEvent(WiFiClient& GUI, const char* message, float num){
+void sendEvent(WiFiClient& GUI, const char* event, float num){
   if(GUI && GUI.connected()){
-    GUI.print(comm::EVENT);
-    GUI.print(comm::DELIMITER);
-    GUI.print(message);
-    GUI.println(num);
+    char message[128];
+    char numberAsString[16];
+
+    dtostrf(num, 8, 2, numberAsString); // apparently %f printf() is disabled by default and this is preferred, no idea why
+
+    int n = snprintf(message, sizeof(message), "%s%c%s%c%s",
+      comm::EVENT, comm::DELIMITER, event, comm::DELIMITER, numberAsString);
+
+    if(n > 0 && n < (int)sizeof(message)){
+      GUI.println(message);
+    }
+
+    // GUI.print(comm::EVENT);
+    // GUI.print(comm::DELIMITER);
+    // GUI.print(message);
+    // GUI.println(num);
   }
 }
