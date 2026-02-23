@@ -9,7 +9,7 @@ class ROB12629{
     volatile unsigned long lastCounter_;
     volatile unsigned long lastTime_;
     volatile double rpm_;
-    static constexpr float COUNTS_PER_REV_ = 4.0f;
+    static constexpr float COUNTS_PER_REV_ = 8.0f; // apparently there's 8 counts per revolution 
   public:
     ROB12629(uint8_t pin) : pin_(pin), counter_(0), lastCounter_(0), lastTime_(0), rpm_(0){
       //empty
@@ -17,6 +17,9 @@ class ROB12629{
 
     //requires us to feed an ISR to it
     void begin(void (*ISR)()){
+      if(pin_ != 2 && pin_ != 3){
+        Serial.println("you're not using interrupt pins");
+      }
       pinMode(pin_, INPUT_PULLUP);
       attachInterrupt(digitalPinToInterrupt(pin_), ISR, RISING);
     }
