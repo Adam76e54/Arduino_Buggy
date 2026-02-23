@@ -93,26 +93,43 @@ void manualLoop(){
 }
 
 void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
-  constexpr float offset = 0.18;
   // constexpr float minTurnSpeed = 0.4;//may need to set this to 0 but we'll tune it to get nicer movement if we can
-  static bool obstacle = false;
-  static uint8_t closeCount = 0;
+  static uint8_t closeCount = 0, farCount = 0;
   constexpr uint8_t MAX_CLOSE_COUNT = 10;
+  constexpr uint8_t MAX_FAR_COUNT = 10; 
 
   //sanity check to filter dodgy sensor readings
   if(distance <= state::maxDistance){
+
     if(closeCount < MAX_CLOSE_COUNT){
-      closeCount++;
+      ++closeCount;
     } 
+    farCount = 0;
+    
   } else {
+
+    if(farCount < MAX_FAR_COUNT){
+      ++farCount;
+    }
     closeCount = 0;
+    
   }
 
-  bool safe = (distance > state::maxDistance) || (closeCount < MAX_CLOSE_COUNT);
-  
+  // we're doing some debouncing here in code because there was jitter
+  static bool safe = false;
+  if(closeCount >= MAX_CLOSE_COUNT){
+    safe = false;
+  } else if(farCount >= MAX_FAR_COUNT){
+    safe = true;
+  }
+
+  static bool previousObstacle = false;  
   if(!state::stopped && safe){//if the distance is safe and we're not stop-commanded, go ahead
-    obstacle = false;
+
+    previousObstacle = false;//if we're moving then this should be reset
+
     constexpr float turnFactor = 0.3;
+    constexpr float offset = 0.18;
 
     if(left && right){
       driver.forward(state::leftSpeedPercentage - offset, state::rightSpeedPercentage);
@@ -127,15 +144,13 @@ void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   } else{
 
     driver.coast();
-    if(distance <= state::maxDistance && !obstacle){//if there previously wasn't an obstacle but now there is, send event
-      obstacle = true;
-      state::stopped = true;
+    if(!safe && !previousObstacle){//if there previously wasn't an previousObstacle but now there is, send event
+      previousObstacle = true;
       sendEvent(GUI, comm::OBSTACLE_MESSAGE);
     }
 
-    if(obstacle && distance >= state::maxDistance){
-      obstacle = false;
-      state::stopped = false;
+    if(previousObstacle && safe){
+      previousObstacle = false;
       sendEvent(GUI, comm::REMOVED_MESSAGE);
     }
   }
