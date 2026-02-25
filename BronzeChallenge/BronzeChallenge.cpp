@@ -95,8 +95,8 @@ void manualLoop(){
 void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
   // constexpr float minTurnSpeed = 0.4;//may need to set this to 0 but we'll tune it to get nicer movement if we can
   static uint8_t closeCount = 0, farCount = 0;
-  constexpr uint8_t MAX_CLOSE_COUNT = 10;
-  constexpr uint8_t MAX_FAR_COUNT = 10; 
+  constexpr uint8_t MAX_CLOSE_COUNT = 15;
+  constexpr uint8_t MAX_FAR_COUNT = 15; 
 
   //sanity check to filter dodgy sensor readings
   if(distance <= state::maxDistance){
