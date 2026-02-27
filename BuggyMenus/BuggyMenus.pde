@@ -1,35 +1,3 @@
-/*
-Bronze:
- - start and stop commands
- - accept and display event reports
-Silver:
- - accept and display wheel rotations?? Not much specified
-Gold:
- - speed commands
- - Receive and display distance figures
-*/
-
-/*
-TO DO:
-- In lab: set up IR sensors, tune the pidUpdate
-
-- Organise this Processing code a bit better
-- Write out the immediate command logic within read() on sam's side, set up the if(now - lastTime) logic on the GUI side
-- Write out more command protocols
-- Set up more buttons
-- Write out the Command struct and Command array[] to simplify handle()'s logic on sam's side
-        struct Command {
-          const char *name;
-          void (*fn)(const char *value);
-        };
-- set up the for loop for ~3 handle()s per loop() iteration
-- setup keyReleased() logic for the WASD handling in manual mode
-- add a heartbeat timeout clause for a failsafe stop
-
--start logging features as we add them for the lab report
-*/
-
-
 import processing.net.*;
 import controlP5.*;
 
