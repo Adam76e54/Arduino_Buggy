@@ -3,25 +3,25 @@
 
 //grey = VCC, purple = GND, blue = D0, green = A0
 class TCRT5000 {
-  uint8_t analog_, digital_;
+  uint8_t analog_, digitalPin;
   int deadband_, levels_;
 
 public:
   TCRT5000(uint8_t analog, uint8_t digital, int deadband = 1) 
-  : analog_(analog), digital_(digital), deadband_(deadband), levels_(1024/deadband_) {
+  : analog_(analog), digitalPin(digital), deadband_(deadband), levels_(1024/deadband_) {
   }
 
   void begin() const {
-    pinMode(digital_, INPUT);
+    pinMode(digitalPin, INPUT);
   }
 
   //Note: don't call bright() or dark() if you're not using a digital pin, it's undefined behaviour
   bool bright() const{
-    return digitalRead(digital_) == LOW;//more reflective gives lower analogRead(), counterintuitively
+    return digitalRead(digitalPin) == LOW;//more reflective gives lower analogRead(), counterintuitively
   }
 
   bool dark() const{
-    return digitalRead(digital_) == HIGH;
+    return digitalRead(digitalPin) == HIGH;
   }
 
   //defines the number of possible levels of analogRead() can occupy, reads the sensor and returns the value. 
