@@ -1,0 +1,150 @@
+/*
+Bronze:
+ - start and stop commands
+ - accept and display event reports
+Silver:
+ - accept and display wheel rotations?? Not much specified
+Gold:
+ - speed commands
+ - Receive and display distance figures
+*/
+
+/*
+TO DO:
+- In lab: set up IR sensors, tune the pidUpdate
+
+- Organise this Processing code a bit better
+- Write out the immediate command logic within read() on sam's side, set up the if(now - lastTime) logic on the GUI side
+- Write out more command protocols
+- Set up more buttons
+- Write out the Command struct and Command array[] to simplify handle()'s logic on sam's side
+        struct Command {
+          const char *name;
+          void (*fn)(const char *value);
+        };
+- set up the for loop for ~3 handle()s per loop() iteration
+- setup keyReleased() logic for the WASD handling in manual mode
+- add a heartbeat timeout clause for a failsafe stop
+
+-start logging features as we add them for the lab report
+*/
+
+
+import processing.net.*;
+import controlP5.*;
+
+void setup(){
+  size(1400, 800);
+  noStroke();
+  noCursor();
+  rectMode(CENTER);
+  
+
+  //connect to sam
+  sam = new Client(this, SAM, PORT);
+  if( sam != null && sam.active()){
+    sam.write("Connected");//this is actually essential. WiFiServer::available() only pulls in client who have data waiting so we need to write something to be seen
+  }
+  
+  //make buttons
+  panel = new ControlP5(this);
+  
+  font = createFont("Arial", 16);
+  
+  downloadButton = makeButton("downloadCSV", width/2 - 70, height/2 + 60,140,60,"Download CSV", font);
+  manualModeButton = makeButton("manualMode", width/2 - 50, 700, 100, 60, "Manual", font);
+  trackModeButton = makeButton("trackMode", width/2 + 75, 700, 100, 60, "Track", font);
+  followModeButton = makeButton("followMode", width/2 - 175, 700, 100, 60, "Follow", font);
+
+  stopToggle = panel.addToggle("StopToggle").setPosition(width/2 - 70, height/2 + 150).setSize(140, 60);
+  stopToggle.setCaptionLabel("Stop");
+  stopToggle.getCaptionLabel().align(ControlP5.CENTER, ControlP5.CENTER).setPaddingX(0).setPaddingY(0).setFont(font);
+  stopToggle.hide();
+  stopToggle.setColorBackground(color(150, 0, 0));
+  stopToggle.setColorForeground(color(175, 0, 0));
+  stopToggle.setColorActive(color(150, 0, 0));
+  
+  // Set the value LAST, after everything is initialised
+  stopToggle.setValue(true);
+  menuButtons.add(downloadButton);
+  menuButtons.add(manualModeButton);
+  menuButtons.add(trackModeButton);
+  menuButtons.add(followModeButton);
+  menuButtons.add(stopToggle);
+  //menuButtons.add(startButton);
+  
+  speedlabel = panel.addTextlabel("speedLabel").setPosition(30,25).setText("Speed: 0.0");
+  speedlabel.setColor(color(0));
+  speedlabel.setFont(font);
+  
+  modelabel = panel.addTextlabel("modeLabel").setPosition(width/2 - 63, 670).setText("Mode: MANUAL");
+  modelabel.setColor(color(0));
+  modelabel.setFont(font);
+  
+  leftIRlabel = panel.addTextlabel("leftIRlabel").setPosition(65, 440).setText("Left IR Sensor Reading: 0.0");
+  leftIRlabel.setColor(color(0));
+  leftIRlabel.setFont(font);
+  
+  rightIRlabel = panel.addTextlabel("rightIRlabel").setPosition(65, 460).setText("Right IR Sensor Reading: 0.0");
+  rightIRlabel.setColor(color(0));
+  rightIRlabel.setFont(font);
+  
+  uslabel = panel.addTextlabel("uslabel").setPosition(65, 480).setText("Ultra Sonic Sensor Reading: 0.0 cm");
+  uslabel.setColor(color(0));
+  uslabel.setFont(font);
+  
+  slider = panel.addSlider("Speed").setPosition(50,50).setSize(40, 200).setRange(0,1).setValue(0);
+  slider.getValueLabel().setColor(color(0)).setFont(createFont("Arial", 12));
+  slider.getCaptionLabel().setVisible(false);
+  slider.hide().setTriggerEvent(Slider.RELEASE);
+  menuButtons.add(slider);
+  
+  int leftDefault = 150;
+  leftThreshold = panel.addSlider("LeftThresholdSlider").setPosition(1000,500).setSize(40,200).setRange(0,300).setValue(leftDefault);
+  leftThreshold.getValueLabel().setColor(color(0)).setFont(createFont("Arial", 12));
+  leftThreshold.getCaptionLabel().setVisible(true).setColor(color(0)).setFont(createFont("Arial", 12)).setText("Left");
+  leftThreshold.hide().setTriggerEvent(Slider.RELEASE);
+  menuButtons.add(leftThreshold);
+  
+  int rightDefault = 150;
+  rightThreshold = panel.addSlider("RightThresholdSlider").setPosition(1100,500).setSize(40,200).setRange(0,300).setValue(rightDefault);
+  rightThreshold.getValueLabel().setColor(color(0)).setFont(createFont("Arial", 12));
+  rightThreshold.getCaptionLabel().setVisible(true).setColor(color(0)).setFont(createFont("Arial", 12)).setText("Right");
+  rightThreshold.hide().setTriggerEvent(Slider.RELEASE);
+  menuButtons.add(rightThreshold);
+  
+  float distanceDefault = 15;
+  maxDistance = panel.addSlider("MaxDistance").setPosition(1200,500).setSize(40,200).setRange(0,50).setValue(distanceDefault);
+  maxDistance.getValueLabel().setColor(color(0)).setFont(createFont("Arial", 12));
+  maxDistance.getCaptionLabel().setVisible(true).setColor(color(0)).setFont(createFont("Arial", 12)).setText("Distance");
+  maxDistance.hide().setTriggerEvent(Slider.RELEASE);
+  menuButtons.add(maxDistance);
+
+}
+
+
+String inBuffer = "";
+
+void draw(){
+  if(sam == null || !sam.active()){
+    if(frameCount % 120 == 0){
+      sam = new Client(this, SAM, PORT);
+    }
+  }
+  
+  ////DEBUG
+  //if(frameCount % 120 == 0){
+  //  println("sam:", sam, "active:", sam != null && sam.active());
+  //}
+  
+  
+  if(state == START){
+    drawStart();
+  }
+  if(state == MENU){
+    drawMenu();
+  }
+  mouse();
+  read(sam);
+
+}
