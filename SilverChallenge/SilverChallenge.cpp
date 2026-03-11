@@ -22,12 +22,12 @@ void setup() {
   // Set up network
   wifi::initialiseAccessPoint();
 
+  // Set up semaphore
 
 
   // Set up tasks
   xTaskCreate(telemetry, "Read from GUI", 1024, nullptr, 1, telemetryHandle);
   xTaskCreate(sense, "Sense and drive", 1024, nullptr, 2, senseHandle);
-
 
   // Start scheduler (does not return)
   vTaskStartScheduler();
@@ -78,6 +78,15 @@ void telemetry(void *parameters){
 
 // - TASK 2 -
 void sense(void *parameters){
+  // NEED TO CONFIRM VALUES FOR THESE CONSTANTS
+  // Set up pins
+  constexpr uint8_t clockPin; 
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, INPTUT);
+
+  // Declare physical constants
+  constexpr float CIRCUMFERENCE = 20.4, DIAMETER = 6.5, AXLE = 14.5;
+
   // Hardware objects
   ROB12629 leftEncoder(2), rightEncoder(3); // THIS NEEDS TO BE CHANGED
   HCSR04 ears(5, 4); // PINS NEED TO BE CHANGED
@@ -90,9 +99,42 @@ void sense(void *parameters){
   leftEncoder.begin(leftISR);
   rightEncoder.begin(rightISR);
 
+
   while(true){
 
 
+  }
+}
+
+// - OTHER FUNCTIONS -
+byte customShiftIn(uint8_t data, uint8_t clock, uint8_t latch){
+  // This is the custom function the lecturer suggested using (although I've made it cleaner)
+  
+  // - Set up the CD4021 -
+  // Get snapshot from CD4040
+  digitalWrite(latch, 1);
+  // Wait a microsecond
+  delayMicroseconds(1);
+  // Force the CD4021 to stop changing for a little bit
+  digitalWrite(latch, 0);
+  
+  // - Perform the actual shift in -
+  byte data = 0;
+  for (uint8_t i = 7; i >= 0; --i){
+    digitalWrite(clock, 0);
+    delayMicroSeconds(0.2);
+    uint8_t bit = digitalRead(myDataPin);
+
+    // Flip the appropriate bit
+    data = data | (bit << i);
+
+    digitalWrite(clock, 1); 
+
+    // Debugging
+    char statement[64];
+    sprintf(statement, "Bit %d should be %d: ", i, bit);
+    Serial.print(statement);
+    Serial.println(data, BIN);
   }
 }
 
