@@ -6,52 +6,34 @@
 
 enum MODE : uint8_t {TRACK, MANUAL, FOLLOW};
 
-//L293D driver(11, 12, 6, 7, 10, 9); should place these in here
 namespace state{
-  extern uint8_t mode;
+  struct State{
+    uint8_t mode = MANUAL;
 
-  //distinguish between percentage speed to feed to methods and actual RPM
-  extern float leftSpeedPercentage;
-  extern float rightSpeedPercentage;
+    float leftSpeedPercentage = 0;
+    float rightSpeedPercentage = 0;
 
-  constexpr uint8_t MAX_RPM = 60;
+    float targetLeftRPM = 0;
+    float targetRightRPM = 0;
 
-  extern float targetLeftRPM;
-  extern float targetRightRPM;
+    unsigned int leftThreshold = 150;
+    unsigned int rightThreshold = 150;
+    float maxDistance = 15.0;
 
-  extern unsigned int leftThreshold;
-  extern unsigned int rightThreshold;
-  extern float maxDistance;
-
-  extern bool stopped;
-};
+    bool stopped = true;
+  } STATE;
+  
+  inline uint8_t& mode = STATE.mode;
+  inline float& leftSpeedPercentage = STATE.leftSpeedPercentage;
+  inline float& rightSpeedPercentage = STATE.rightSpeedPercentage;
+  inline float& targetLeftRPM = STATE.targetLeftRPM;
+  inline float& targetRightRPM = STATE.targetRightRPM;
+  inline unsigned int& leftThreshold = STATE.leftThreshold;
+  inline unsigned int& rightThreshold = STATE.rightThreshold;
+  inline float& maxDistance = STATE.maxDistance;
+  inline bool& stopped = STATE.stopped;
+}
 
 struct Coefficients{
   float KP, KI, KD;
 };
-
-// void manualLoop(){
-//   //do very little? 
-// }
-
-// void trackLoop(bool left, bool right, unsigned int distance, WiFiClient& GUI){
-//   constexpr float offset = 0.21;
-//   constexpr float scaleDown = 1;
-//   if(distance > state::maxDistance){
-
-//     if(left && right){
-//       driver.forward(state::leftSpeedPercentage - offset, state::rightSpeedPercentage);
-//     } else if(left && !right){
-//       driver.forward((state::leftSpeedPercentage - offset), 0);
-//     } else if(!left && right){
-//       driver.forward(0, (state::rightSpeedPercentage));
-//     } else{
-//       driver.coast();
-//     }
-
-//   } else{
-//     driver.coast();
-//     // sendEvent(GUI, "Stopped");
-//     // delay(10);
-//   }
-// }
