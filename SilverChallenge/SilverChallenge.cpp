@@ -108,36 +108,7 @@ void sense(void *parameters){
 }
 
 // - OTHER FUNCTIONS -
-byte customShiftIn(uint8_t data, uint8_t clock, uint8_t latch){
-  // This is the custom function the lecturer suggested using (although I've made it cleaner)
-  
-  // - Set up the CD4021 -
-  // Get snapshot from CD4040
-  digitalWrite(latch, 1);
-  // Wait a microsecond
-  delayMicroseconds(1);
-  // Force the CD4021 to stop changing for a little bit
-  digitalWrite(latch, 0);
-  
-  // - Perform the actual shift in -
-  byte data = 0;
-  for (uint8_t i = 7; i >= 0; --i){
-    digitalWrite(clock, 0);
-    delayMicroSeconds(0.2);
-    uint8_t bit = digitalRead(myDataPin);
 
-    // Flip the appropriate bit
-    data = data | (bit << i);
-
-    digitalWrite(clock, 1); 
-
-    // Debugging
-    char statement[64];
-    sprintf(statement, "Bit %d should be %d: ", i, bit);
-    Serial.print(statement);
-    Serial.println(data, BIN);
-  }
-}
 
 void printStackUsage() {
   // This function just gives us stack-usage so we can know roughly how much memory each task needs
