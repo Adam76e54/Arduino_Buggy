@@ -4,10 +4,12 @@
 
 // Declaration of Interrupt Service Routines
 void leftISR(); void rightISR();
+ROB12629 leftEncoder(2), rightEncoder(3); // THIS NEEDS TO BE CHANGED.
 
 // Tasks (for scheduler to handle)
 void telemetry(void *);
 void sense(void *);
+
 
 // Declare handles for each task, used to pass to task-analysing functions like uxTaskGetStackHighWaterMark()
 TaskHandle_t telemetryHandle, senseHandle;
@@ -80,7 +82,7 @@ void telemetry(void *parameters){
 void sense(void *parameters){
   // NEED TO CONFIRM VALUES FOR THESE CONSTANTS
   // Set up pins
-  constexpr uint8_t clockPin; 
+  constexpr uint8_t clockPin, dataPin, latchPin; 
   pinMode(clockPin, OUTPUT);
   pinMode(dataPin, INPTUT);
 
@@ -88,7 +90,6 @@ void sense(void *parameters){
   constexpr float CIRCUMFERENCE = 20.4, DIAMETER = 6.5, AXLE = 14.5;
 
   // Hardware objects
-  ROB12629 leftEncoder(2), rightEncoder(3); // THIS NEEDS TO BE CHANGED
   HCSR04 ears(5, 4); // PINS NEED TO BE CHANGED
   L293D driver(6,7,11,12,9,10);
 
