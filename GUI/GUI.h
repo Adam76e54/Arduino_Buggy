@@ -161,8 +161,11 @@ void handleModes(char command[], L293D& driver){
 
 void handleThresholds(char command[]){
 
+  #ifdef state::leftThreshold
+  #define
   constexpr uint8_t delimiterSize = 1;
   uint8_t irSize = strlen(comm::IR);
+
   if(strncmp(command, comm::LEFT, strlen(comm::LEFT)) == 0){
     const char* nextPart = command + strlen(comm::LEFT) + delimiterSize;
 
@@ -172,6 +175,10 @@ void handleThresholds(char command[]){
       state::leftThreshold = value;
     }
   }
+  #endif
+
+  #ifdef state::rightThreshold
+  #define
   if(strncmp(command, comm::RIGHT, strlen(comm::RIGHT)) == 0){
     const char* nextPart = command + strlen(comm::RIGHT) + delimiterSize;
 
@@ -181,6 +188,7 @@ void handleThresholds(char command[]){
       state::rightThreshold = value;
     }
   }
+  #endif
 }
 
 void handleDistance(char command[]){

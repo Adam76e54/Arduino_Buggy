@@ -7,11 +7,10 @@ class ROB12629{
     uint8_t pin_;//one digital pin
     volatile unsigned long counter_;
     unsigned long lastCounter_;
-    unsigned long lastTime_;
     double rps_; //revs per second
     static constexpr float COUNTS_PER_REV_ = 4.0f; // apparently there's 8 counts per revolution 
   public:
-    ROB12629(uint8_t pin) : pin_(pin), counter_(0), lastCounter_(0), lastTime_(0), rps_(0){
+    ROB12629(uint8_t pin) : pin_(pin), counter_(0), lastCounter_(0), rps_(0){
       //empty
     }
 
@@ -39,18 +38,14 @@ class ROB12629{
       return lastCounter_;
     }
 
-    void update(unsigned long interval){
+    void update(unsigned long &lastTime, unsigned long interval){
       auto now = micros();
-      unsigned long dt_m = now - lastTime_;
+      unsigned long dt_m = now - lastTime;
       if(dt_m < interval) return;//only update if over the interval
-      lastTime_ = now;
+      lastTime = now;
 
       noInterrupts();
       unsigned int dc = counter_ - lastCounter_;
-      // Handle wraparound
-      if(lastCounter_ > counter){
-        dc = (counter_ + 255) - lastCounter_;
-      }
       interrupts();
 
       lastCounter_ = counter_;

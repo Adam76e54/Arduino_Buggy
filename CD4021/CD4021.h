@@ -1,3 +1,4 @@
+#pragma once
 #include <Arduino.h>
 
 class CD4021 {
@@ -5,7 +6,6 @@ class CD4021 {
     uint8_t clock_, data_, latch_; 
 
     uint8_t lastCounter_;
-    unsigned long lastTime_;
     double rps_;
 
     static constexpr float COUNTS_PER_REV_ = 4.0f; // apparently there's 8 counts per revolution 
@@ -17,7 +17,6 @@ class CD4021 {
       , data_(data)
       , latch_(latch)
       , lastCounter_(0)
-      , lastTime_(0)
       , rps_(0) {}
 
     void begin() {
@@ -26,40 +25,13 @@ class CD4021 {
       pinMode(data_, INPUT);
       digitalWrite(clock_, LOW);
       digitalWrite(latch_, LOW);
-      lastTime_ = micros();
     }
 
     double revsPerSecond() const{
       return rps_;
     }
-    void update(uint8_t counter, unsigned long interval_microseconds){
-      auto now = micros();
-      unsigned long dt_micro = now - lastTime_;
 
-      if(dt_micro < interval_microseconds) return;//only update if time interval is large enough
-      lastTime_ = now;
-
-      // We'll be computing dc/dt to get rpm 
-      unsigned int dc = counter - lastCounter_;
-
-      // Handle wraparound
-      if(lastCounter_ > counter){
-        dc = (counter + 255) - lastCounter_;
-      }
-
-      lastCounter_ = counter;
-
-      if(dc == 0){
-        rps_ = 0;
-        return;
-      }
-
-      float revs = (float)dc / COUNTS_PER_REV_;
-      double dt_s = dt_micro * 1e-6f;//convert micros to seconds;b
-      rps_ = (revs/dt_s);
-    }
-
-    void read(unsigned long interval_microseconds){
+    void read(unsigned long &lastTime, unsigned long interval_microseconds){
       // This is the custom function the lecturer suggested using (although I've made it cleaner)
       
       // - Set up the CD4021 -
@@ -88,6 +60,29 @@ class CD4021 {
         Serial.println(data, BIN);
       }
 
-      update(data, interval_microseconds);
+      update(data, lastTime, interval_microseconds);
     }
-}
+
+  private:
+    void update(uint8_t counter, unsigned long &lastTime, unsigned long interval_microseconds){
+      auto now = micros();
+      unsigned long dt_micro = now - lastTime;
+
+      if(dt_micro < interval_microseconds) return;//only update if time interval is large enough
+      lastTime = now;
+
+      // We'll be computing dc/dt to get rpm 
+      unsigned int dc = counter - lastCounter_;
+
+      lastCounter_ = counter;
+
+      if(dc == 0){
+        rps_ = 0;
+        return;
+      }
+
+      float revs = (float)dc / COUNTS_PER_REV_;
+      double dt_s = dt_micro * 1e-6f;//convert micros to seconds;b
+      rps_ = (revs/dt_s);
+    }
+};

@@ -17,6 +17,7 @@ namespace state{
     float targetRightRPM = 0;
 
     float maxDistance = 15.0;
+    float currentDistance = 999.0;
 
     bool stopped = true;
   } STATE;
@@ -30,8 +31,13 @@ namespace state{
   inline float& targetRightRPM = STATE.targetRightRPM;
 
   inline float& maxDistance = STATE.maxDistance;
+  inline float& currentDistance = STATE.currentDistance;
 
   inline bool& stopped = STATE.stopped;
+
+  float MAX_RPM = 120;        
+  float leftThreshold;  
+  float rightThreshold; 
 }
 
 struct Coefficients{
