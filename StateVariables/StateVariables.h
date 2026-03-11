@@ -16,21 +16,21 @@ namespace state{
     float targetLeftRPM = 0;
     float targetRightRPM = 0;
 
-    unsigned int leftThreshold = 150;
-    unsigned int rightThreshold = 150;
     float maxDistance = 15.0;
 
     bool stopped = true;
   } STATE;
   
   inline uint8_t& mode = STATE.mode;
+  
   inline float& leftSpeedPercentage = STATE.leftSpeedPercentage;
   inline float& rightSpeedPercentage = STATE.rightSpeedPercentage;
+
   inline float& targetLeftRPM = STATE.targetLeftRPM;
   inline float& targetRightRPM = STATE.targetRightRPM;
-  inline unsigned int& leftThreshold = STATE.leftThreshold;
-  inline unsigned int& rightThreshold = STATE.rightThreshold;
+
   inline float& maxDistance = STATE.maxDistance;
+
   inline bool& stopped = STATE.stopped;
 }
 
